@@ -28,7 +28,7 @@ let rendererConfig = {
   },
   externals: [
     ...Object.keys(dependencies || {}).filter(
-      (d) => !whiteListedModules.includes(d)
+      (d) => !whiteListedModules.includes(d),
     ),
   ],
   module: {
@@ -36,7 +36,7 @@ let rendererConfig = {
       {
         test: /\.(js|vue)$/,
         enforce: 'pre',
-        exclude: /node_modules(?!.*rsk-common(?!.*node_modules))/,
+        exclude: /node_modules/,
         use: {
           loader: 'eslint-loader',
           options: {
@@ -59,7 +59,7 @@ let rendererConfig = {
       {
         test: /\.js$/,
         use: 'babel-loader',
-        exclude: /node_modules(?!.*rsk-common(?!.*node_modules))/,
+        exclude: /node_modules/,
       },
       {
         test: /\.node$/,
@@ -67,7 +67,7 @@ let rendererConfig = {
       },
       {
         test: /\.vue$/,
-        exclude: /node_modules(?!.*rsk-common(?!.*node_modules))/,
+        exclude: /node_modules/,
         use: {
           loader: 'vue-loader',
           options: {
@@ -80,7 +80,7 @@ let rendererConfig = {
       },
       {
         test: /\.(png|jpe?g|gif|svg)(\?.*)?$/,
-        exclude: /node_modules(?!.*rsk-common(?!.*node_modules))/,
+        exclude: /node_modules/,
         use: {
           loader: 'url-loader',
           query: {
@@ -92,7 +92,7 @@ let rendererConfig = {
       {
         test: /\.(mp4|webm|ogg|mp3|wav|flac|aac)(\?.*)?$/,
         loader: 'url-loader',
-        exclude: /node_modules(?!.*rsk-common(?!.*node_modules))/,
+        exclude: /node_modules/,
         options: {
           limit: 10000,
           name: 'media/[name]--[folder].[ext]',
@@ -153,7 +153,6 @@ let rendererConfig = {
     alias: {
       '@': path.join(__dirname, '../src/renderer'),
       vue$: 'vue/dist/vue.esm.js',
-      '@common': path.join(__dirname, '../node_modules/rsk-common'),
     },
     extensions: ['.js', '.vue', '.json', '.css', '.node'],
   },
@@ -168,7 +167,7 @@ if (process.env.NODE_ENV !== 'production') {
     new webpack.HotModuleReplacementPlugin(),
     new webpack.DefinePlugin({
       __static: `"${path.join(__dirname, '../static').replace(/\\/g, '\\\\')}"`,
-    })
+    }),
   );
 }
 
@@ -192,7 +191,7 @@ if (process.env.NODE_ENV === 'production') {
     }),
     new webpack.LoaderOptionsPlugin({
       minimize: true,
-    })
+    }),
   );
 }
 

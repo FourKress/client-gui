@@ -1,4 +1,4 @@
-# rsk-finance-electron-app
+# electron-python-app
 
 > An electron-vue project
 
