@@ -6,7 +6,7 @@ block_cipher = None
 
 a = Analysis(
     ['FarmZone_2022_11_13_serial.py','FlowField_2022_11_13.py','Obtain_wind_probability_2022_11_13.py','Optimizer_2022_11_13.py', 'WindTurbine_2022_11_13.py'],
-    pathex=['C:\\Users\wudong\\WebstormProjects\\client-demo\\static'],
+    pathex=['C:\\Users\wudong\\WebstormProjects\\client-gui\\static'],
     binaries=[],
     datas=[],
     hiddenimports=[],
