@@ -1,0 +1,25 @@
+date:2022-11-25 02:06:11
+seed:1
+num_points:32
+num_particles:3
+num_iter:10
+num_arvs:64
+fitness_initial:0.0
+dist_threshold:281.6
+vel_threshold:1.0
+mu:4
+c1:2.5
+c1s:2.5
+c1e:0.5
+c2:0.5
+c2s:0.5
+c2e:2.5
+w:0.9
+ws:0.9
+we:0.4
+fitness_gbest:-1201.167513801891
+index:0
+num_pbest_changed:3
+num_gbest_changed:3
+num_solutions_found:6
+num_entirely_updated:0
