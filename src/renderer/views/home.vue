@@ -8,7 +8,7 @@
         <PanelSecond ref="PanelSecond" :isStart="isStart" />
       </el-tab-pane>
       <el-tab-pane :label="tabs[2]">
-        <PanelThird ref="PanelThird" @start="handleStart" :isStart="isStart" />
+        <PanelThird ref="PanelThird" @start="handleStart" @stop="handleStop" :isStart="isStart" />
       </el-tab-pane>
       <el-tab-pane :label="tabs[3]">
         <PanelFour ref="PanelFour" :isStart="isStart" />
@@ -175,6 +175,9 @@ export default {
           this.isStart = false;
         }
       });
+    },
+    handleStop() {
+      console.log(132);
     },
     //
     // onUpdate() {

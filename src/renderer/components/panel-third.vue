@@ -83,6 +83,9 @@
       <el-button type="primary":disabled="isStart" @click="onContinue" class="save-btn">
         继续计算
       </el-button>
+      <el-button type="primary":disabled="isStart" @click="onStop" class="save-btn">
+        停止
+      </el-button>
     </div>
   </div>
 </template>
@@ -149,6 +152,9 @@ export default {
     onStart() {
       this.$emit('start', false);
     },
+    onStop() {
+      this.$emit('stop', false);
+    }
   },
 };
 </script>

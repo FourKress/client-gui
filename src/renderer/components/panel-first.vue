@@ -37,8 +37,21 @@
             v-model="form.dist_threshold"
           ></el-input>
         </el-form-item>
-        <el-form-item label="height_hub" prop="height_hub">
-          <el-input :disabled="isStart" v-model="form.height_hub"></el-input>
+        <el-form-item label="turbine_setting" prop="turbine_setting">
+          <el-button
+            type="primary"
+            :disabled="isStart"
+            @click="onSelectOnly('turbine_setting')"
+          >
+            选择
+          </el-button>
+          <el-tag
+            v-if="form.turbine_setting"
+            :closable="!isStart"
+            @close="handlePathCloseOnly('turbine_setting')"
+          >
+            {{ form.turbine_setting }}
+          </el-tag>
         </el-form-item>
       </div>
       <div class="right">
@@ -99,7 +112,7 @@ export default {
         parameters_turbine: [],
         num_turbines: '',
         dist_threshold: '',
-        height_hub: '',
+        turbine_setting: '',
         is_specify_loc_turbines_initial: false,
         dir_turbine_loc: '',
       },
@@ -113,8 +126,8 @@ export default {
         dist_threshold: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
         ],
-        height_hub: [
-          { required: true, message: '请输入', trigger: ['blur', 'change'] },
+        turbine_setting: [
+          { required: true, message: '请选择', trigger: ['blur', 'change'] },
         ],
       },
     };
