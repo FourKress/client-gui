@@ -67,7 +67,7 @@ export default {
       tabs: ['风机设置', '计算域设置', '优化器设置', '图形显示'],
       msgList: [],
       isStart: false,
-      history_dir_working: '1',
+      history_dir_working: '',
       historyConfig: null,
     };
   },
@@ -79,8 +79,7 @@ export default {
     },
   },
   mounted() {
-    // this.history_dir_working = localStorage.getItem('history_dir_working');
-    console.log(this.history_dir_working, !this.history_dir_working);
+    this.history_dir_working = localStorage.getItem('history_dir_working');
   },
   methods: {
     handleStart(isContinue) {
@@ -120,7 +119,7 @@ export default {
       });
     },
     onStart(params) {
-      localStorage.setItem('history_dir_working', params.dir_working);
+      localStorage.setItem('history_dir_working', `${params.dir_working}/${params.name_to_save}_setting.npy`);
       this.msgList = [];
       this.isStart = true;
       this.startCount++;
@@ -157,7 +156,7 @@ export default {
     },
     importConfig() {
       console.log(this.history_dir_working);
-      ipcRenderer.send('loadConfig', '/Users/wudong/Works/python/GUI_Version/Optimizer_2022_11_26_setting.npy');
+      ipcRenderer.send('loadConfig', this.history_dir_working);
       ipcRenderer.once('resultConfig', (_event, data) => {
         const config = `${data.replace(/[\r\n]/g, '').replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')}`;
         this.historyConfig = JSON.parse(config);
