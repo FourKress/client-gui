@@ -76,6 +76,10 @@
               message: '请选择',
               trigger: ['blur', 'change'],
             },
+            {
+              validator: this.validateFnc,
+              trigger: ['blur', 'change'],
+            },
           ]"
         >
           <el-button
@@ -101,11 +105,12 @@
 
 <script>
 import Mixins from '../mixins';
+import { validateInt, validateFloat } from '../utils';
 
 export default {
   name: 'PanelFirst',
   mixins: [Mixins],
-  props: ['isStart'],
+  props: ['isStart', 'historyConfig'],
   data() {
     return {
       form: {
@@ -122,9 +127,17 @@ export default {
         // ],
         num_turbines: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: validateInt,
+            trigger: ['blur', 'change'],
+          },
         ],
         dist_threshold: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: validateFloat,
+            trigger: ['blur', 'change'],
+          },
         ],
         turbine_setting: [
           { required: true, message: '请选择', trigger: ['blur', 'change'] },
@@ -132,14 +145,42 @@ export default {
       },
     };
   },
+  watch: {
+    // eslint-disable-next-line func-names
+    'form.is_specify_loc_turbines_initial': function (val) {
+      if (!val) {
+        this.form.dir_turbine_loc = '';
+        this.$refs.form.clearValidate('dir_turbine_loc');
+      }
+    },
+    historyConfig: {
+      deep: true,
+      handler(val) {
+        this.$refs.form.resetFields();
+        const keys = Object.keys(this.form);
+        keys.forEach((key) => {
+          this.form[key] = val[key] || this.form[key];
+        });
+      },
+    },
+  },
   methods: {
+    validateFnc(rule, value, callback) {
+      if (this.form.is_specify_loc_turbines_initial && !value) {
+        callback('请选择');
+      }
+      callback();
+    },
     validate() {
       return new Promise((resolve) => {
         this.$refs.form.validate((valid) => {
+          const { is_specify_loc_turbines_initial } = this.form;
           resolve({
             valid,
             form: {
               ...this.form,
+              is_specify_loc_turbines_initial:
+                is_specify_loc_turbines_initial || '',
               parameters_turbine: undefined,
             },
           });

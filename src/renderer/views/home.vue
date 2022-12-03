@@ -2,13 +2,19 @@
   <div class="main">
     <el-tabs type="border-card" class="tabs">
       <el-tab-pane :label="tabs[0]">
-        <PanelFirst ref="PanelFirst" :isStart="isStart" />
+        <PanelFirst ref="PanelFirst" :historyConfig="historyConfig" :isStart="isStart" />
       </el-tab-pane>
       <el-tab-pane :label="tabs[1]">
-        <PanelSecond ref="PanelSecond" :isStart="isStart" />
+        <PanelSecond ref="PanelSecond" :historyConfig="historyConfig" :isStart="isStart" />
       </el-tab-pane>
       <el-tab-pane :label="tabs[2]">
-        <PanelThird ref="PanelThird" @start="handleStart" @stop="handleStop" :isStart="isStart" />
+        <PanelThird
+          ref="PanelThird"
+          @start="handleStart"
+          @stop="handleStop"
+          :historyConfig="historyConfig"
+          :isStart="isStart"
+        />
       </el-tab-pane>
       <el-tab-pane :label="tabs[3]">
         <PanelFour ref="PanelFour" :isStart="isStart" />
@@ -16,57 +22,25 @@
     </el-tabs>
 
     <div class="dynamic-output">
-      <p v-for="(msg, index) in msgList" :key="index">{{ msg }}</p>
+      <el-input
+        type="textarea"
+        autosize
+        resize="none"
+        disabled
+        v-for="(msg, index) in msgList"
+        :key="index"
+        :value="msg"
+      ></el-input>
     </div>
 
     <el-button
       type="text"
-      :disabled="isStart"
+      :disabled="isStart || !history_dir_working"
       class="import-btn"
-      @click="dialogVisible = true"
+      @click="importConfig"
     >
-      导入历史配置
+      导入上次计算配置
     </el-button>
-    <el-dialog
-      title="导入历史配置"
-      :visible.sync="dialogVisible"
-      :close-on-press-escape="false"
-      :close-on-click-modal="false"
-      @close="closeDialog"
-    >
-      <el-form ref="form" :model="form">
-        <el-form-item
-          label="配置文件"
-          label-width="150"
-          prop="historyConfig"
-          :rules="[
-            {
-              required: true,
-              message: '请选择',
-              trigger: ['blur', 'change'],
-            },
-          ]"
-        >
-          <el-button type="primary" @click="onSelectOnly('historyConfig')">
-            选择
-          </el-button>
-          <el-tag
-            v-if="form.historyConfig"
-            closable
-            @close="handlePathCloseOnly('historyConfig')"
-            type="success"
-          >
-            {{ form.historyConfig }}
-          </el-tag>
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary" @click="handleImportHistoryConfig">
-          确 定
-        </el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -91,12 +65,10 @@ export default {
     return {
       startCount: 0,
       tabs: ['风机设置', '计算域设置', '优化器设置', '图形显示'],
-      dialogVisible: false,
-      form: {
-        historyConfig: '',
-      },
       msgList: [],
       isStart: false,
+      history_dir_working: '1',
+      historyConfig: null,
     };
   },
   watch: {
@@ -106,20 +78,15 @@ export default {
       }
     },
   },
+  mounted() {
+    // this.history_dir_working = localStorage.getItem('history_dir_working');
+    console.log(this.history_dir_working, !this.history_dir_working);
+  },
   methods: {
-    closeDialog() {
-      this.$refs.form.resetFields();
-      this.$refs.form.clearValidate();
-      this.dialogVisible = false;
-    },
-    handleImportHistoryConfig() {
-      this.$refs.form.validate((valid) => {
-        if (valid) {
-          this.closeDialog();
-        }
-      });
-    },
     handleStart(isContinue) {
+      console.log(isContinue);
+      // this.onStart({});
+
       Promise.all([
         this.$refs.PanelFirst.validate(),
         this.$refs.PanelSecond.validate(),
@@ -153,6 +120,7 @@ export default {
       });
     },
     onStart(params) {
+      localStorage.setItem('history_dir_working', params.dir_working);
       this.msgList = [];
       this.isStart = true;
       this.startCount++;
@@ -177,7 +145,25 @@ export default {
       });
     },
     handleStop() {
-      console.log(132);
+      this.$confirm('确定停止计算吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          ipcRenderer.send('stop');
+        })
+        .catch(() => {});
+    },
+    importConfig() {
+      console.log(this.history_dir_working);
+      ipcRenderer.send('loadConfig', '/Users/wudong/Works/python/GUI_Version/Optimizer_2022_11_26_setting.npy');
+      ipcRenderer.once('resultConfig', (_event, data) => {
+        const config = `${data.replace(/[\r\n]/g, '').replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')}`;
+        this.historyConfig = JSON.parse(config);
+        console.log(this.historyConfig);
+        this.$message.success('历史配置导入成功');
+      });
     },
     //
     // onUpdate() {
@@ -245,5 +231,13 @@ export default {
   align-items: center;
   justify-content: space-between;
   margin: 6px 0;
+}
+
+.el-textarea.is-disabled .el-textarea__inner {
+  background-color: unset;
+  color: unset;
+  cursor: default;
+  border: none;
+  padding: 0 6px;
 }
 </style>

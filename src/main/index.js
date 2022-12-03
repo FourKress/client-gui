@@ -14,6 +14,12 @@ if (process.env.NODE_ENV !== 'development') {
     .replace(/\\/g, '\\\\'); // eslint-disable-line
 }
 
+/* 隐藏electron创听的菜单栏 */
+// Menu.setApplicationMenu(null);
+
+const encoding = 'cp936';
+const binaryEncoding = 'binary';
+
 let mainWindow;
 const winURL =
   process.env.NODE_ENV === 'development'
@@ -40,56 +46,79 @@ ipcMain.on('getResult', (event, args) => {
   });
 });
 
+ipcMain.on('loadConfig', (event, args) => {
+  console.log('args', args);
+  let pyPath = `${path.join(__static, './loadConfig.py')}`;
+  if (process.env.NODE_ENV !== 'development') {
+    pyPath = path
+      .join(__static, '/loadConfig.py')
+      .replace('\\app.asar\\dist\\electron', '');
+  }
+  const loadProcess = childProcess.spawn('python3', [`${pyPath}`, args]);
+  loadProcess.stdout.on('data', (data) => {
+    const result = decode(Buffer.from(data, binaryEncoding), encoding);
+    console.log(`config: ${result}`);
+    event.sender.send('resultConfig', result.toString());
+  });
+  loadProcess.on('close', (code) => {
+    console.log(`加载配置结束，退出码 ${code}`);
+  });
+});
+
 ipcMain.on('start', (event, args) => {
   const [index, params] = args;
   console.log(`参数: ${JSON.stringify(params)}`);
   console.log('————————开始PY进程————————');
 
-  // let pyPath = `${path.join(__static, './FarmZone_2022_11_13_serial.py')}`;
-  // if (process.env.NODE_ENV !== 'development') {
-  //   pyPath = path
-  //     .join(__static, '/FarmZone_2022_11_13_serial.py')
-  //     .replace('\\app.asar\\dist\\electron', '');
-  // }
-  // const workerProcess = childProcess.spawn('python', [
-  //   `${pyPath}`,
-  //   `${JSON.stringify({
-  //     ...params,
-  //   })}`,
-  // ]);
-
-  let pyPath = `${path.join(
-    __static,
-    './dist/FarmZone_2022_11_13_serial/FarmZone_2022_11_13_serial.exe',
-  )}`;
+  let pyPath = `${path.join(__static, './FarmZone_2022_11_26_serial.py')}`;
   if (process.env.NODE_ENV !== 'development') {
     pyPath = path
-      .join(
-        __static,
-        '/dist/FarmZone_2022_11_13_serial/FarmZone_2022_11_13_serial.exe',
-      )
+      .join(__static, '/FarmZone_2022_11_13_serial.py')
       .replace('\\app.asar\\dist\\electron', '');
   }
-  const workerProcess = childProcess.spawn(`${pyPath}`, [
-    JSON.stringify(params),
+  const workerProcess = childProcess.spawn('python3', [
+    `${pyPath}`,
+    `${JSON.stringify({
+      ...params,
+    })}`,
   ]);
 
-  const encoding = 'cp936';
-  const binaryEncoding = 'binary';
+  // let pyPath = `${path.join(
+  //   __static,
+  //   './dist/FarmZone_2022_11_26_serial/FarmZone_2022_11_26_serial.exe',
+  // )}`;
+  // if (process.env.NODE_ENV !== 'development') {
+  //   pyPath = path
+  //     .join(
+  //       __static,
+  //       '/dist/FarmZone_2022_11_26_serial/FarmZone_2022_11_26_serial.exe',
+  //     )
+  //     .replace('\\app.asar\\dist\\electron', '');
+  // }
+  // const workerProcess = childProcess.spawn(`${pyPath}`, [
+  //   JSON.stringify(params),
+  // ]);
+
+  console.log(workerProcess.pid);
 
   workerProcess.stdout.on('data', (data) => {
     const result = decode(Buffer.from(data, binaryEncoding), encoding);
-    console.log(`stdout: ${result.toString()}`);
-    event.sender.send(`stdout_${index}`, result.toString());
+    console.log(`stdout: ${result}`);
+    event.sender.send(`stdout_${index}`, result);
   });
   workerProcess.stderr.on('data', (data) => {
     const result = decode(Buffer.from(data, binaryEncoding), encoding);
     console.log(`stderr: ${result}`);
-    event.sender.send(`stderr_${index}`, result.toString());
+    event.sender.send(`stderr_${index}`, result);
   });
   workerProcess.on('close', (code) => {
     console.log(`计算结束，退出码 ${code}`);
     event.sender.send(`close_${index}`, `计算结束，退出码 ${code}`);
+  });
+
+  ipcMain.once('stop', () => {
+    console.log('stop', workerProcess.pid);
+    process.kill(workerProcess.pid, 'SIGINT');
   });
 });
 

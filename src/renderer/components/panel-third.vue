@@ -9,7 +9,11 @@
     >
       <div class="left">
         <el-form-item label="选择工作目录" prop="dir_working">
-          <el-button type="primary" :disabled="isStart" @click="onSelectOnly('dir_working', 'openDirectory')">
+          <el-button
+            type="primary"
+            :disabled="isStart"
+            @click="onSelectOnly('dir_working', 'openDirectory')"
+          >
             选择
           </el-button>
           <el-tag
@@ -22,7 +26,10 @@
         </el-form-item>
 
         <el-form-item label="num_opt_iteration" prop="num_opt_iteration">
-          <el-input :disabled="isStart" v-model="form.num_opt_iteration"></el-input>
+          <el-input
+            :disabled="isStart"
+            v-model="form.num_opt_iteration"
+          ></el-input>
         </el-form-item>
         <el-form-item label="step_check" prop="step_check">
           <el-input :disabled="isStart" v-model="form.step_check"></el-input>
@@ -35,55 +42,112 @@
         </el-form-item>
       </div>
       <div class="right">
-        <el-form-item
-          label="高级选项"
-          prop="advanced"
-        >
+        <el-form-item label="高级选项" prop="advanced">
           <el-checkbox
             :disabled="isStart"
             v-model="form.advanced"
           ></el-checkbox>
         </el-form-item>
 
-        <el-form-item
-          label="is_set_new_vel"
-          prop="is_set_new_vel"
-        >
+        <el-form-item label="is_set_new_vel" prop="is_set_new_vel">
           <el-checkbox
             :disabled="isStart || !form.advanced"
             v-model="form.is_set_new_vel"
           ></el-checkbox>
         </el-form-item>
-        <el-form-item
-          label="is_new_flow_field"
-          prop="is_new_flow_field"
-        >
+        <el-form-item label="is_new_flow_field" prop="is_new_flow_field">
           <el-checkbox
             :disabled="isStart || !form.advanced"
             v-model="form.is_new_flow_field"
           ></el-checkbox>
         </el-form-item>
 
-        <el-form-item label="seed_numpy" prop="seed_numpy">
-          <el-input :disabled="isStart || !form.advanced" v-model="form.seed_numpy"></el-input>
+        <el-form-item
+          label="seed_numpy"
+          prop="seed_numpy"
+          :rules="[
+            {
+              required: form.advanced,
+              message: '请输入',
+              trigger: ['blur', 'change'],
+            },
+            {
+              validator: this.validateInt,
+              trigger: ['blur', 'change'],
+            },
+          ]"
+        >
+          <el-input
+            :disabled="isStart || !form.advanced"
+            v-model="form.seed_numpy"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="num_particles" prop="num_particles">
-          <el-input :disabled="isStart || !form.advanced" v-model="form.num_particles"></el-input>
+        <el-form-item
+          label="num_particles"
+          prop="num_particles"
+          :rules="[
+            {
+              required: form.advanced,
+              message: '请输入',
+              trigger: ['blur', 'change'],
+            },
+            {
+              validator: this.validateInt,
+              trigger: ['blur', 'change'],
+            },
+          ]"
+        >
+          <el-input
+            :disabled="isStart || !form.advanced"
+            v-model="form.num_particles"
+          ></el-input>
         </el-form-item>
-        <el-form-item label="fitness_initial" prop="fitness_initial">
-          <el-input :disabled="isStart || !form.advanced" v-model="form.fitness_initial"></el-input>
+        <el-form-item
+          label="fitness_initial"
+          prop="fitness_initial"
+          :rules="[
+            {
+              required: form.advanced,
+              message: '请输入',
+              trigger: ['blur', 'change'],
+            },
+            {
+              validator: this.validateFloat,
+              trigger: ['blur', 'change'],
+            },
+          ]"
+        >
+          <el-input
+            :disabled="isStart || !form.advanced"
+            v-model="form.fitness_initial"
+          ></el-input>
         </el-form-item>
       </div>
     </el-form>
 
     <div class="btn-list">
-      <el-button type="primary":disabled="isStart" @click="onStart" class="save-btn">
+      <el-button
+        type="primary"
+        :disabled="isStart"
+        @click="onStart"
+        class="save-btn"
+      >
         新计算
       </el-button>
-      <el-button type="primary":disabled="isStart" @click="onContinue" class="save-btn">
+      <el-button
+        type="primary"
+        :disabled="isStart"
+        @click="onContinue"
+        class="save-btn"
+      >
         继续计算
       </el-button>
-      <el-button type="primary":disabled="isStart" @click="onStop" class="save-btn">
+      <el-button
+        type="primary"
+        :disabled="!isStart"
+        @click="onStop"
+        class="save-btn"
+      >
         停止
       </el-button>
     </div>
@@ -92,11 +156,12 @@
 
 <script>
 import Mixins from '../mixins';
+import { validateFloat, validateInt } from '../utils';
 
 export default {
   name: 'PanelFirst',
   mixins: [Mixins],
-  props: ['isStart'],
+  props: ['isStart', 'historyConfig'],
   data() {
     return {
       form: {
@@ -108,9 +173,9 @@ export default {
         advanced: false,
         is_set_new_vel: false,
         is_new_flow_field: false,
-        seed_numpy: '',
-        num_particles: '',
-        fitness_initial: '',
+        seed_numpy: 1,
+        num_particles: 100,
+        fitness_initial: 0,
       },
       rules: {
         dir_working: [
@@ -118,9 +183,17 @@ export default {
         ],
         num_opt_iteration: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: validateInt,
+            trigger: ['blur', 'change'],
+          },
         ],
         step_check: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: validateInt,
+            trigger: ['blur', 'change'],
+          },
         ],
         name_to_save: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
@@ -131,15 +204,55 @@ export default {
       },
     };
   },
+  watch: {
+    // eslint-disable-next-line func-names
+    'form.advanced': function (val) {
+      if (!val) {
+        this.form.is_set_new_vel = false;
+        this.form.is_new_flow_field = false;
+        this.form.seed_numpy = 1;
+        this.form.num_particles = 100;
+        this.form.fitness_initial = 0;
+        this.$refs.form.clearValidate('seed_numpy');
+        this.$refs.form.clearValidate('num_particles');
+        this.$refs.form.clearValidate('fitness_initial');
+      }
+    },
+    historyConfig: {
+      deep: true,
+      handler(val) {
+        this.$refs.form.resetFields();
+        const keys = Object.keys(this.form);
+        const advancedKeys = ['is_set_new_vel', 'is_new_flow_field', 'seed_numpy', 'num_particles', 'fitness_initial'];
+        let advanced = false;
+        advancedKeys.forEach(k => {
+          if (!advanced && val[k] !== this.form[k]) {
+            advanced = true;
+          }
+        });
+        this.form.advanced = advanced;
+
+        keys.forEach((key) => {
+          this.form[key] = val[key] || this.form[key];
+        });
+      },
+    },
+  },
   methods: {
+    validateFloat,
+    validateInt,
     validate() {
       return new Promise((resolve) => {
         this.$refs.form.validate((valid) => {
+          const { is_set_new_vel, is_new_flow_field, fitness_initial } = this.form;
           resolve({
             valid,
             form: {
               ...this.form,
               advanced: undefined,
+              fitness_initial: fitness_initial || '0.0',
+              is_set_new_vel: is_set_new_vel || '',
+              is_new_flow_field: is_new_flow_field || '',
             },
           });
         });
@@ -154,7 +267,7 @@ export default {
     },
     onStop() {
       this.$emit('stop', false);
-    }
+    },
   },
 };
 </script>

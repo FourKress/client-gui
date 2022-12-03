@@ -71,6 +71,10 @@
                 trigger: ['blur', 'change'],
               },
               {
+                validator: validateFloat,
+                trigger: ['blur', 'change'],
+              },
+              {
                 validator: validateFnc,
                 trigger: ['blur', 'change'],
               },
@@ -180,12 +184,19 @@
 
 <script>
 import Mixins from '../mixins';
+import { validateInt, validateFloat } from '../utils';
 
 export default {
   name: 'PanelSecond',
   mixins: [Mixins],
-  props: ['isStart'],
+  props: ['isStart', 'historyConfig'],
   data() {
+    const checkValue = (rule, value, callback) => {
+      if ((value && !/^\d+(?:\.\d+)?$/.test(value)) || value > 1 || value < 0) {
+        callback('请输入0.0-1.0的整数或浮点数');
+      }
+      callback();
+    };
     return {
       windList: [],
       form: {
@@ -214,24 +225,34 @@ export default {
         wind_directions: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
         ],
-        wind_file_item: [
-          { required: true, message: '请选择', trigger: ['blur', 'change'] },
-        ],
-        wind_direction_item: [
-          { required: true, message: '请输入', trigger: ['blur', 'change'] },
-        ],
 
         height_mast: [
           { required: true, message: '请选择', trigger: ['blur', 'change'] },
+          {
+            validator: validateFloat,
+            trigger: ['blur', 'change'],
+          },
         ],
         num_direction: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: validateInt,
+            trigger: ['blur', 'change'],
+          },
         ],
         num_speed: [
           { required: true, message: '请选择', trigger: ['blur', 'change'] },
+          {
+            validator: validateInt,
+            trigger: ['blur', 'change'],
+          },
         ],
         threshold_probability: [
           { required: true, message: '请输入', trigger: ['blur', 'change'] },
+          {
+            validator: checkValue,
+            trigger: ['blur', 'change'],
+          },
         ],
 
         dir_ground_file: [
@@ -246,15 +267,32 @@ export default {
       },
     };
   },
+  watch: {
+    historyConfig: {
+      deep: true,
+      handler(val) {
+        this.$refs.form.resetFields();
+        const keys = Object.keys(this.form);
+        keys.forEach((key) => {
+          if (['boundary_files', 'wind_files', 'wind_directions'].includes(key)) {
+            this.form[key] = val[`list_${key}`];
+          } else {
+            this.form[key] = val[key];
+          }
+        });
+
+        this.windList = this.form.wind_files.map((d, index) => ({
+          direction: this.form.wind_directions[index],
+          path: d,
+        }));
+      },
+    },
+  },
   mounted() {
-    if (this.form.wind_files?.length) {
-      this.windList = this.form.wind_files.map((d, index) => ({
-        direction: this.form.wind_directions[index],
-        path: d,
-      }));
-    }
   },
   methods: {
+    validateFloat,
+
     onAdd() {
       this.$refs.form.validateField('wind_file_item');
       this.$refs.form.validateField('wind_direction_item');
