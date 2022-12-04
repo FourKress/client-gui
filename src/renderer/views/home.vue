@@ -35,12 +35,52 @@
 
     <el-button
       type="text"
-      :disabled="isStart || !history_dir_working"
+      :disabled="isStart"
       class="import-btn"
-      @click="importConfig"
+      @click="dialogVisible = true"
     >
-      导入上次计算配置
+      导入历史配置
     </el-button>
+    <el-dialog
+      title="导入历史配置"
+      :visible.sync="dialogVisible"
+      :close-on-press-escape="false"
+      :close-on-click-modal="false"
+      @close="closeDialog"
+    >
+      <el-form ref="form" :model="form">
+        <el-form-item
+          label="配置文件"
+          label-width="150"
+          prop="historyConfig"
+          :rules="[
+            {
+              required: true,
+              message: '请选择',
+              trigger: ['blur', 'change'],
+            },
+          ]"
+        >
+          <el-button type="primary" @click="onSelectOnly('historyConfig')">
+            选择
+          </el-button>
+          <el-tag
+            v-if="form.historyConfig"
+            closable
+            @close="handlePathCloseOnly('historyConfig')"
+            type="success"
+          >
+            {{ form.historyConfig }}
+          </el-tag>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">取 消</el-button>
+        <el-button type="primary" @click="handleImportHistoryConfig">
+          确 定
+        </el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -67,7 +107,10 @@ export default {
       tabs: ['风机设置', '计算域设置', '优化器设置', '图形显示'],
       msgList: [],
       isStart: false,
-      history_dir_working: '',
+      dialogVisible: false,
+      form: {
+        historyConfig: '',
+      },
       historyConfig: null,
     };
   },
@@ -79,13 +122,37 @@ export default {
     },
   },
   mounted() {
-    this.history_dir_working = localStorage.getItem('history_dir_working');
   },
   methods: {
+    closeDialog() {
+      this.$refs.form.resetFields();
+      this.$refs.form.clearValidate();
+      this.dialogVisible = false;
+    },
+    handleImportHistoryConfig() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          const loading = this.$loading({
+            lock: true,
+            text: '配置导入中...',
+            spinner: 'el-icon-loading',
+            background: 'rgba(0, 0, 0, 0.7)',
+          });
+
+          ipcRenderer.send('loadConfig', this.form.historyConfig);
+          ipcRenderer.once('resultConfig', (_event, data) => {
+            const config = `${data.replace(/[\r\n]/g, '').replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')}`;
+            this.historyConfig = JSON.parse(config);
+            console.log(this.historyConfig);
+            loading.close();
+            this.$message.success('历史配置导入成功');
+          });
+          this.closeDialog();
+        }
+      });
+    },
     handleStart(isContinue) {
       console.log(isContinue);
-      // this.onStart({});
-
       Promise.all([
         this.$refs.PanelFirst.validate(),
         this.$refs.PanelSecond.validate(),
@@ -119,7 +186,6 @@ export default {
       });
     },
     onStart(params) {
-      localStorage.setItem('history_dir_working', `${params.dir_working}/${params.name_to_save}_setting.npy`);
       this.msgList = [];
       this.isStart = true;
       this.startCount++;
@@ -153,16 +219,6 @@ export default {
           ipcRenderer.send('stop');
         })
         .catch(() => {});
-    },
-    importConfig() {
-      console.log(this.history_dir_working);
-      ipcRenderer.send('loadConfig', this.history_dir_working);
-      ipcRenderer.once('resultConfig', (_event, data) => {
-        const config = `${data.replace(/[\r\n]/g, '').replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')}`;
-        this.historyConfig = JSON.parse(config);
-        console.log(this.historyConfig);
-        this.$message.success('历史配置导入成功');
-      });
     },
     //
     // onUpdate() {

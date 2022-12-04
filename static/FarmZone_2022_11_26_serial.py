@@ -1440,7 +1440,7 @@ class Farm_zone():
 if __name__ == '__main__':
 
 
-    click_load = True
+    click_load = False
     setting_info = {}
     #============================User defined parts===========================#
 
@@ -1486,7 +1486,7 @@ if __name__ == '__main__':
         setting_info['list_boundary_files'] = [] #add directories to this list: list_boundary_files.append()
             #for each new adding,select file:
         for boundary_file in params['boundary_files']:
-            list_boundary_files.append(boundary_file)
+            setting_info['list_boundary_files'].append(boundary_file)
 
 
 
@@ -1507,10 +1507,10 @@ if __name__ == '__main__':
             #for each new adding,select file:
 
         for wind_file in params['wind_files']:
-            list_wind_files.append(wind_file)
+            setting_info['list_wind_files'].append(wind_file)
 
         for wind_direction in params['wind_directions']:
-            list_wind_directions.append(float(wind_direction))
+            setting_info['list_wind_directions'].append(float(wind_direction))
 
     else:
         #--------------user specify the file-------------#

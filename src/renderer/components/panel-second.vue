@@ -275,7 +275,7 @@ export default {
         const keys = Object.keys(this.form);
         keys.forEach((key) => {
           if (['boundary_files', 'wind_files', 'wind_directions'].includes(key)) {
-            this.form[key] = val[`list_${key}`];
+            this.form[key] = [...val[`list_${key}`]];
           } else {
             this.form[key] = val[key];
           }
