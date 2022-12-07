@@ -2,13 +2,13 @@
   <div class="tab-panel">
     <el-tabs tab-position="left">
       <el-tab-pane label="图1+图2">
-        <ImgPanel />
+        <ImgPanel :urlArr="first" :srcList="srcList" />
       </el-tab-pane>
       <el-tab-pane label="图3+图4">
-        <ImgPanel />
+        <ImgPanel :urlArr="second" :srcList="srcList" />
       </el-tab-pane>
       <el-tab-pane label="图5+图6">
-        <ImgPanel />
+        <ImgPanel :urlArr="third" :srcList="srcList" />
       </el-tab-pane>
     </el-tabs>
     <div>
@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { ipcRenderer } from 'electron';
 import ImgPanel from './img-panel';
 
 export default {
@@ -27,8 +28,32 @@ export default {
   components: {
     ImgPanel,
   },
+  data() {
+    return {
+      first: [],
+      second: [],
+      third: [],
+      srcList: [],
+    };
+  },
   methods: {
-    onUpdate() {},
+    onUpdate() {
+      ipcRenderer.send('getResult');
+      ipcRenderer.once('result', (event, data) => {
+        if (!data) return;
+        this.first = [data.CT_vs_Speeds, data.Power_vs_Speeds];
+        this.second = [
+          data.turbines_boundary_flowfield_all_direction,
+          data.iteration_status,
+        ];
+        this.third = [
+          data.streamlines_3D_all_directions,
+          data.isoheight_wind_with_reduce_all_direction_probability,
+        ];
+        this.srcList = [...this.first, ...this.second, ...this.third].filter(d => d);
+        console.log(this.first);
+      });
+    },
   },
 };
 </script>
@@ -48,10 +73,10 @@ export default {
   }
 
   /deep/ .el-tabs__item {
-    padding:  0 15px 0 0 !important;
+    padding: 0 15px 0 0 !important;
     color: #606266;
     &.is-active {
-      color: #409EFF;
+      color: #409eff;
     }
   }
   .el-tab-pane {

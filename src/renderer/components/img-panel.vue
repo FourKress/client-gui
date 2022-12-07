@@ -1,10 +1,14 @@
 <template>
   <div class="img-panel">
     <div class="left">
-      <el-image src="" fit="contain"></el-image>
+      <el-image :src="urlArr[0]" :preview-src-list="srcList" fit="contain">
+        <span slot="error" class="image-slot">暂无数据</span>
+      </el-image>
     </div>
     <div class="right">
-      <el-image src="" fit="contain"></el-image>
+      <el-image :src="urlArr[1]" :preview-src-list="srcList" fit="contain">
+        <span slot="error" class="image-slot">暂无数据</span>
+      </el-image>
     </div>
   </div>
 </template>
@@ -12,6 +16,16 @@
 <script>
 export default {
   name: 'ImgPanel',
+  props: {
+    urlArr: {
+      type: Array,
+      default: () => [],
+    },
+    srcList: {
+      type: Array,
+      default: () => [],
+    },
+  },
 };
 </script>
 
@@ -35,7 +49,7 @@ export default {
     width: 50%;
     height: 100%;
     box-sizing: border-box;
-    background-color: #ccc;
+    border: 1px solid #ccc;
   }
 
   .left {

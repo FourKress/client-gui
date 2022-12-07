@@ -220,14 +220,6 @@ export default {
         })
         .catch(() => {});
     },
-    //
-    // onUpdate() {
-    //   ipcRenderer.send('getResult', [this.form.filePath]);
-    //   ipcRenderer.once('result', (event, data) => {
-    //     console.log(event, data);
-    //     this.imgUrl = data;
-    //   });
-    // },
   },
 };
 </script>

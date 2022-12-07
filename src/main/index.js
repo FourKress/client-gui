@@ -19,6 +19,7 @@ Menu.setApplicationMenu(null);
 
 const encoding = 'cp936';
 const binaryEncoding = 'binary';
+let dir_working = '';
 
 let mainWindow;
 const winURL =
@@ -38,12 +39,23 @@ ipcMain.on('open-directory-dialog', (event, args) => {
     });
 });
 
-ipcMain.on('getResult', (event, args) => {
-  fs.readFile(`${args[0]}/demo_fig.jpg`, (err, data) => {
-    if (err) return;
-    const b64 = Buffer.from(data).toString('base64');
-    event.sender.send('result', `data:image/jpg;base64,${b64}`);
-  });
+ipcMain.on('getResult', async (event) => {
+  const imgArr = fs.readdirSync(dir_working).filter((d) => d.includes('jpg'));
+  let b64Map = null;
+  if (imgArr?.length) {
+    b64Map = {};
+    await Promise.all(imgArr.map((d) => {
+      const imgData = fs.readFileSync(`${dir_working}/${d}`);
+      const b64 = Buffer.from(imgData).toString('base64');
+      const name = d.split('.')[0];
+
+      b64Map[name] = `data:image/jpg;base64,${b64}`;
+
+      return b64;
+    }));
+  }
+
+  event.sender.send('result', b64Map);
 });
 
 ipcMain.on('loadConfig', (event, args) => {
@@ -55,23 +67,15 @@ ipcMain.on('loadConfig', (event, args) => {
   //     .replace('\\app.asar\\dist\\electron', '');
   // }
 
-  let pyPath = `${path.join(
-    __static,
-    './dist/loadConfig.exe',
-  )}`;
+  let pyPath = `${path.join(__static, './dist/loadConfig.exe')}`;
   if (process.env.NODE_ENV !== 'development') {
     pyPath = path
-      .join(
-        __static,
-        '/dist/loadConfig.exe',
-      )
+      .join(__static, '/dist/loadConfig.exe')
       .replace('\\app.asar\\dist\\electron', '');
   }
 
   // const loadProcess = childProcess.spawn('python', [`${pyPath}`, args]);
-  const loadProcess = childProcess.spawn(`${pyPath}`, [
-    args,
-  ]);
+  const loadProcess = childProcess.spawn(`${pyPath}`, [args]);
   loadProcess.stdout.on('data', (data) => {
     const result = decode(Buffer.from(data, binaryEncoding), encoding);
     console.log(`config: ${result}`);
@@ -84,6 +88,9 @@ ipcMain.on('loadConfig', (event, args) => {
 
 ipcMain.on('start', (event, args) => {
   const [index, params] = args;
+
+  dir_working = params.dir_working;
+
   console.log(`参数: ${JSON.stringify(params)}`);
   console.log('————————开始PY进程————————');
 
