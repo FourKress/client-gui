@@ -30,6 +30,8 @@ import multiprocessing as mp
 
 import json
 
+matplotlib.use('Agg')
+
 params = json.loads(sys.argv[1])
 
 class Farm_zone():

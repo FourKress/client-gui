@@ -60,3 +60,9 @@ export default {
   }
 }
 </style>
+
+<style lang="less">
+.el-image {
+  height: 100%;
+}
+</style>

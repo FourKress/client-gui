@@ -239,6 +239,7 @@ export default {
     width: 100%;
     box-sizing: border-box;
     flex: 1;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
 
