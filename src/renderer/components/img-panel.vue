@@ -32,7 +32,7 @@ export default {
 <style scoped lang="less">
 .img-panel {
   width: 100%;
-  height: 100%;
+  height: calc(100% - 22px);
   display: flex;
   align-items: center;
   justify-content: space-between;

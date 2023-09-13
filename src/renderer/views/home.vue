@@ -2,10 +2,18 @@
   <div class="main">
     <el-tabs type="border-card" class="tabs">
       <el-tab-pane :label="tabs[0]">
-        <PanelFirst ref="PanelFirst" :historyConfig="historyConfig" :isStart="isStart" />
+        <PanelFirst
+          ref="PanelFirst"
+          :historyConfig="historyConfig"
+          :isStart="isStart"
+        />
       </el-tab-pane>
       <el-tab-pane :label="tabs[1]">
-        <PanelSecond ref="PanelSecond" :historyConfig="historyConfig" :isStart="isStart" />
+        <PanelSecond
+          ref="PanelSecond"
+          :historyConfig="historyConfig"
+          :isStart="isStart"
+        />
       </el-tab-pane>
       <el-tab-pane :label="tabs[2]">
         <PanelThird
@@ -21,6 +29,7 @@
       </el-tab-pane>
     </el-tabs>
 
+    <div class="tips">动态监视计算过程</div>
     <div class="dynamic-output">
       <el-input
         type="textarea"
@@ -33,14 +42,23 @@
       ></el-input>
     </div>
 
-    <el-button
-      type="text"
-      :disabled="isStart"
-      class="import-btn"
-      @click="dialogVisible = true"
+    <el-tooltip
+      slot="label"
+      effect="dark"
+      content="可以导入之前计算保存好的历史配置，避免繁复的设定操作。"
+      placement="left"
     >
-      导入历史配置
-    </el-button>
+      <el-button
+        type="text"
+        :disabled="isStart"
+        class="import-btn"
+        @click="dialogVisible = true"
+      >
+        导入历史配置
+        <i class="el-icon-question"></i>
+      </el-button>
+    </el-tooltip>
+
     <el-dialog
       title="导入历史配置"
       :visible.sync="dialogVisible"
@@ -121,8 +139,7 @@ export default {
       }
     },
   },
-  mounted() {
-  },
+  mounted() {},
   methods: {
     closeDialog() {
       this.$refs.form.resetFields();
@@ -141,7 +158,11 @@ export default {
 
           ipcRenderer.send('loadConfig', this.form.historyConfig);
           ipcRenderer.once('resultConfig', (_event, data) => {
-            const config = `${data.replace(/[\r\n]/g, '').replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')}`;
+            const config = `${data
+              .replace(/[\r\n]/g, '')
+              .replace(/'/g, '"')
+              .replace(/False/g, 'false')
+              .replace(/True/g, 'true')}`;
             this.historyConfig = JSON.parse(config);
             console.log(this.historyConfig);
             loading.close();
@@ -253,6 +274,16 @@ export default {
     }
   }
 
+  .tips {
+    width: 100%;
+    height: 22px;
+    line-height: 22px;
+    background-color: #e4e7ed;
+    color: #333;
+    font-size: 12px;
+    padding-left: 16px;
+    box-sizing: border-box;
+  }
   .dynamic-output {
     width: 100%;
     min-height: 300px;
@@ -260,7 +291,7 @@ export default {
     overflow-y: auto;
     box-sizing: border-box;
     border: 16px solid #e4e7ed;
-
+    border-top: none;
     background-color: #fff;
     color: #333;
   }

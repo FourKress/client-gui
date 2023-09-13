@@ -127,7 +127,7 @@ class Farm_zone():
             self.list_turbines[i].wind_org = self.flowfield.get_3D_interporlation(direction,
                                                                                   [self.list_turbines[i].coordinate[0],
                                                                                    self.list_turbines[i].coordinate[1],
-                                                                                   self.list_turbines[i].height])
+                                                                                   self.list_turbines[i].height+self.list_turbines[i].h_hub])
             self.flowfield.l_local_wind_direction[i] = self.list_turbines[i].wind_org/np.linalg.norm(self.list_turbines[i].wind_org,ord=2)
         pass
     pass

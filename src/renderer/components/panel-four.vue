@@ -3,12 +3,23 @@
     <el-tabs tab-position="left">
       <el-tab-pane label="图1+图2">
         <ImgPanel :urlArr="first" :srcList="srcList" />
+        <div class="tips">
+          <span>显示风机的性能曲线</span>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="图3+图4">
         <ImgPanel :urlArr="second" :srcList="srcList" />
+        <div class="tips">
+          <span>动态监视计算过程</span>
+          <span>动态监视优化进展，当该线平直意味着不在更新优化，可以中断</span>
+        </div>
       </el-tab-pane>
       <el-tab-pane label="图5+图6">
         <ImgPanel :urlArr="third" :srcList="srcList" />
+        <div class="tips">
+          <span>显示尾流情况</span>
+          <span></span>
+        </div>
       </el-tab-pane>
     </el-tabs>
     <div>
@@ -64,6 +75,22 @@ export default {
   display: flex;
   flex-direction: column;
 
+  .tips {
+    width: 100%;
+    height: 22px;
+    line-height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      flex: 1;
+      text-align: center;
+      color: #333;
+      font-size: 12px;
+    }
+  }
+
   .el-tabs--left {
     flex: 1;
 
@@ -85,7 +112,7 @@ export default {
 
   .save-btn {
     width: 120px;
-    margin: 30px auto 0;
+    margin: 10px auto 0;
     display: block;
   }
 }

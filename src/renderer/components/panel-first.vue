@@ -8,36 +8,50 @@
       label-width="150px"
     >
       <div class="left">
-        <el-form-item label="parameters_turbine" prop="parameters_turbine">
-          <el-button
-            type="primary"
-            :disabled="isStart || true"
-            @click="onSelect('parameters_turbine')"
+        <el-form-item prop="num_turbines">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="设置风机台数"
+            placement="top"
           >
-            选择
-          </el-button>
-          <div class="tag-panel" v-if="form.parameters_turbine.length">
-            <el-tag
-              v-for="path in form.parameters_turbine"
-              :key="path"
-              :closable="!isStart"
-              @close="handlePathClose(path, 'parameters_turbine')"
-            >
-              {{ path }}
-            </el-tag>
-          </div>
-        </el-form-item>
-
-        <el-form-item label="num_turbines" prop="num_turbines">
+            <span>
+              风机总数
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input :disabled="isStart" v-model="form.num_turbines"></el-input>
         </el-form-item>
-        <el-form-item label="dist_threshold" prop="dist_threshold">
+
+        <el-form-item prop="dist_threshold">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="在优化过程中不允许风机之间的间距低于该值。"
+            placement="top"
+          >
+            <span>
+              风机最小间距
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input
             :disabled="isStart"
             v-model="form.dist_threshold"
           ></el-input>
         </el-form-item>
-        <el-form-item label="turbine_setting" prop="turbine_setting">
+        <el-form-item prop="turbine_setting">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="通过excel设置风机参数：其中，height填写0，f_fan填写风机叶片半径，h_hub填写轮毂高度，z0填写地表粗糙度。后三列填写不同风速下单个风机的功率何CT系数。"
+            placement="top"
+          >
+            <span>
+              导入风机参数
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -56,10 +70,20 @@
       </div>
       <div class="right">
         <el-form-item
-          label="is_specify_loc_turbines_initial"
           prop="is_specify_loc_turbines_initial"
           label-width="200px"
         >
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="可以通过excel表设置风机的初始位置，优化程序将在此位置的基础上开展继续优化。excel表终每一行为每个风机的x坐标和y坐标，使用与流场和地形相同的坐标系。"
+            placement="top"
+          >
+            <span>
+              设置风机阵列初始位置
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-checkbox
             :disabled="isStart"
             v-model="form.is_specify_loc_turbines_initial"
@@ -67,7 +91,7 @@
         </el-form-item>
 
         <el-form-item
-          label="dir_turbine_loc"
+          label="导入风机阵列位置"
           prop="dir_turbine_loc"
           label-width="200px"
           :rules="[

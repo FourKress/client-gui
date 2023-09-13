@@ -8,7 +8,18 @@
       label-width="150px"
     >
       <div class="left">
-        <el-form-item label="boundary_files" prop="boundary_files">
+        <el-form-item prop="boundary_files">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="可以导入多个区域定义文件，所有区域的并集为风机可布置的区域。单个区域由一系列组成这个区域边界的逆时针点位坐标构成。"
+            placement="top"
+          >
+            <span>
+              风机可布区域
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -29,7 +40,6 @@
         </el-form-item>
 
         <el-form-item
-          label="wind_files"
           prop="wind_file_item"
           :rules="[
             {
@@ -43,6 +53,17 @@
             },
           ]"
         >
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="是其他CFD软件计算所得。反应了空间中每一个点相对测风塔位置的流动加速比。"
+            placement="top"
+          >
+            <span>
+              选择风场文件
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -80,6 +101,17 @@
               },
             ]"
           >
+            <el-tooltip
+              slot="label"
+              effect="dark"
+              content="每个风场文件需要指定其风向。以自西向东为x轴，风向角定义为从x轴逆时针旋转的角度，单位角度。"
+              placement="top"
+            >
+            <span>
+              设置风向并导入
+              <i class="el-icon-question"></i>
+            </span>
+            </el-tooltip>
             <el-input
               :disabled="isStart"
               v-model="form.wind_direction_item"
@@ -107,7 +139,18 @@
           </div>
         </div>
 
-        <el-form-item label="dir_ground_file" prop="dir_ground_file">
+        <el-form-item prop="dir_ground_file">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="地形起伏情况。"
+            placement="top"
+          >
+            <span>
+              导入地形
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -124,7 +167,18 @@
           </el-tag>
         </el-form-item>
 
-        <el-form-item label="dir_mesh_file" prop="dir_mesh_file">
+        <el-form-item prop="dir_mesh_file">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="CFD网格文件。"
+            placement="top"
+          >
+            <span>
+              导入空间网格
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -141,7 +195,18 @@
           </el-tag>
         </el-form-item>
 
-        <el-form-item label="dir_measured_wind" prop="dir_measured_wind">
+        <el-form-item prop="dir_measured_wind">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="导入风场实测数据，以自动计算不同风速下、不同风向下的风机功率和CT。"
+            placement="top"
+          >
+            <span>
+              导入测风塔数据
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-button
             type="primary"
             :disabled="isStart"
@@ -159,19 +224,62 @@
         </el-form-item>
       </div>
       <div class="right">
-        <el-form-item label="height_mast" prop="height_mast">
+        <el-form-item prop="height_mast">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="测点高度。"
+            placement="top"
+          >
+            <span>
+              测风塔高度
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input :disabled="isStart" v-model="form.height_mast"></el-input>
         </el-form-item>
-        <el-form-item label="num_direction" prop="num_direction">
+        <el-form-item prop="num_direction">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="与风向导入数目一致。"
+            placement="top"
+          >
+            <span>
+              风向角总数
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input :disabled="isStart" v-model="form.num_direction"></el-input>
         </el-form-item>
-        <el-form-item label="num_speed" prop="num_speed">
+        <el-form-item prop="num_speed">
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="将测风塔测得的风速范围分为多个区域进行计算。分区越多，计算越精细，但也越慢。建议5~10。"
+            placement="top"
+          >
+            <span>
+              风向分区
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input :disabled="isStart" v-model="form.num_speed"></el-input>
         </el-form-item>
         <el-form-item
           label="threshold_probability"
-          prop="threshold_probability"
         >
+          <el-tooltip
+            slot="label"
+            effect="dark"
+            content="当风速风向的发生几率低于该阈值，则不考虑，以加速计算结果。建议0.01~0.1。"
+            placement="top"
+          >
+            <span>
+              风速风向概率阈值
+              <i class="el-icon-question"></i>
+            </span>
+          </el-tooltip>
           <el-input
             :disabled="isStart"
             v-model="form.threshold_probability"
